@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>ChatGPT Integration</title>
+</head>
+<body>
+    <div id="chat-container">
+        <div id="chat-log"></div>
+        <input type="text" id="user-input" placeholder="Type your message..." />
+        <button id="send-button">Send</button>
+    </div>
+
+    <script>
+    // script.js
+
+const chatLog = document.getElementById("chat-log");
+const userInput = document.getElementById("user-input");
+const sendButton = document.getElementById("send-button");
+
+// Replace with your OpenAI API key
+const apiKey = "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";
+
+sendButton.addEventListener("click", async () => {
+    const userMessage = userInput.value;
+    if (userMessage.trim() === "") return;
+
+    appendMessage(userMessage, "user");
+
+    const response = await sendMessageToChatGPT(userMessage);
+    appendMessage(response.choices[0].message.content, "chatgpt");
+
+    userInput.value = "";
+});
+
+async function sendMessageToChatGPT(message) {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [
+                { role: "system", content: "You are a helpful assistant." },
+                { role: "user", content: message }
+            ]
+        })
+    });
+
+    return await response.json();
+}
+
+function appendMessage(message, sender) {
+    const messageElement = document.createElement("div");
+    messageElement.classList.add("message", sender);
+    messageElement.innerText = message;
+    chatLog.appendChild(messageElement);
+}
+
+    </script>
+</body>
+</html>
